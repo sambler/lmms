@@ -22,6 +22,7 @@
  *
  */
 
+#include <QtCore/QtGlobal>
 #include <QDomElement>
 #include <QDir>
 #include <QFile>
@@ -350,7 +351,11 @@ void ConfigManager::loadConfigFile()
 		#endif
 			setBackgroundArtwork( value( "paths", "backgroundartwork" ) );
 		}
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 		else if( QApplication::type() == QApplication::GuiClient )
+#else
+		else if( qobject_cast<QGuiApplication *>qApp )
+#endif
 		{
 			QMessageBox::warning( NULL, MainWindow::tr( "Configuration file" ),
 									MainWindow::tr( "Error while parsing configuration file at line %1:%2: %3" ).
@@ -409,7 +414,11 @@ void ConfigManager::loadConfigFile()
 						<< defaultArtworkDir() );
 
 	if( !QDir( m_workingDir ).exists() &&
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
 		QApplication::type() == QApplication::GuiClient &&
+#else
+		qobject_cast<QGuiApplication *>qApp &&
+#endif
 		QMessageBox::question( 0,
 			MainWindow::tr( "Working directory" ),
 			MainWindow::tr( "The LMMS working directory %1 does not "
